@@ -1,0 +1,18 @@
+body {
+    font-family: 'Montserrat', sans-serif;
+}
+
+#grid {
+    margin: 0 auto;
+}
+
+#grid td {
+    width: 100px;
+    height: 100px;
+    display: inline-block;
+    line-height: 100px;
+    font-weight: bold;
+    font-size: 38px;
+    text-align: center;
+    padding: 0;
+}
