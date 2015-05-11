@@ -4,15 +4,22 @@ body {
 
 #grid {
     margin: 0 auto;
+    position: relative;
 }
 
-#grid td {
-    width: 100px;
-    height: 100px;
+#grid .tile {
     display: inline-block;
-    line-height: 100px;
     font-weight: bold;
     font-size: 38px;
     text-align: center;
     padding: 0;
+    background-color: cadetblue;
+    position: absolute;
 }
+
+.slide {
+    -webkit-transition: -webkit-transform 0.5s; /* Safari */
+    transition: transform 0.5s;
+}
+
+
