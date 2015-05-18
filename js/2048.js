@@ -41,7 +41,34 @@ Grid.prototype.born = function () {
     // a new tile born with 2 or 4 randomly
     var newLocation = locations[Math.floor(Math.random() * locations.length)].split(','),
         n = Math.floor(Math.random() * 2 + 1);
-    this.tiles[newLocation[0]][newLocation[1]] = new Tile(n, newLocation[0], newLocation[1]);
+    var newTile = new Tile(n);
+    i = parseInt(newLocation[0]);
+    j = parseInt(newLocation[1]);
+
+    var left = j * this.tileSize + (j + 1) * this.separatorSize,
+        top = i * this.tileSize + (i + 1) * this.separatorSize,
+        tile;
+    tile = document.createElement('div');
+    tile.className = 'tile';
+    tile.id = newTile.id = '' + this.seq++;
+    tile.style.width = this.tileSize + 'px';
+    tile.style.height = this.tileSize + 'px';
+    tile.style.lineHeight = this.tileSize + 'px';
+
+    tile.style.top = top + 'px';
+    tile.style.left = left + 'px';
+
+    tile.appendChild(document.createTextNode( '' + Math.pow(2, n)));
+
+
+
+    this.tiles[i][j] = newTile;
+
+    var gridId = this.id;
+
+    setTimeout(function(){
+        document.getElementById(gridId).appendChild(tile);
+    }, 300);
 
 };
 
@@ -174,15 +201,7 @@ Grid.prototype.slideDown = function () {
     return avai;
 };
 
-Grid.prototype.log = function () {
-    for (var i = 0; i < this.tiles.length; i++) {
-        var row = this.tiles[i];
-        console.log('| ' + row.join(' | ') + ' |');
-    }
-    console.log('\r\n');
-};
-
-Grid.prototype.show = function () {
+Grid.prototype.render = function () {
 
     var grid = document.getElementById(this.id),
         frag = document.createDocumentFragment();
@@ -195,28 +214,17 @@ Grid.prototype.show = function () {
                 var left = j * this.tileSize + (j + 1) * this.separatorSize,
                     top = i * this.tileSize + (i + 1) * this.separatorSize,
                     tile;
-                if(row[j].id) {
-                    tile = document.getElementById(row[j].id);
-                    tile.replaceChild(document.createTextNode(
-                        row[j] ? '' + Math.pow(2, row[j].pow) : ''), tile.firstChild);
 
-                } else {
+                tile = document.getElementById(row[j].id);
+                tile.replaceChild(document.createTextNode(
+                    row[j] ? '' + Math.pow(2, row[j].pow) : ''), tile.firstChild);
 
-                    tile = document.createElement('div');
+                left = left - parseInt(tile.style.left.replace('px',''));
+                top = top - parseInt(tile.style.top.replace('px', ''));
 
-                    tile.id = row[j].id = '' + this.seq++;
+                tile.style.transform = 'translate(' + left + 'px,' + top + 'px)';
+                tile.className = 'tile slide tile-' + row[j].pow;
 
-                    tile.style.width = this.tileSize + 'px';
-                    tile.style.height = this.tileSize + 'px';
-                    tile.style.lineHeight = this.tileSize + 'px';
-                    tile.appendChild(document.createTextNode(row[j] ? '' + Math.pow(2, row[j].pow) : ''));
-                    frag.appendChild(tile);
-                }
-
-                tile.className = 'tile';
-                tile.className += ' tile-' + row[j].pow;
-                tile.style.top = top + 'px';
-                tile.style.left = left + 'px';
             }
         }
     }
@@ -239,29 +247,29 @@ Grid.prototype.show = function () {
 
     g.born();
     g.born();
-    g.show();
 
     window.addEventListener('keyup', function (e) {
         switch (e.keyCode) {
             case 37:
                 g.slideLeft();
+                g.render();
                 g.born();
-                g.show();
+
                 break;
             case 38:
                 g.slideUp();
+                g.render();
                 g.born();
-                g.show();
                 break;
             case 39:
                 g.slideRight();
+                g.render();
                 g.born();
-                g.show();
                 break;
             case 40:
                 g.slideDown();
+                g.render();
                 g.born();
-                g.show();
                 break;
             default :
                 break;
