@@ -15,28 +15,47 @@ body {
     padding: 0;
     background-color: cadetblue;
     position: absolute;
-
-}
-
-.slide {
+    
     -moz-transition: transform 0.2s;
     -o-transition: transform 0.2s;
     -webkit-transition: -webkit-transform 0.2s;
     transition: transform 0.2s;
 }
 
-.fresh {
-    transform: scale(1.25, 1.25);
-    -ms-transform: scale(1.25, 1.25);
-    -o-transform: scale(1.25, 1.25);
-    -moz-transform: scale(1.25, 1.25);
-    -webkit-transform: scale(1.25, 1.25);
+@-webkit-keyframes zoomIn {
+  0% {
+    opacity: 0;
+    -webkit-transform: scale3d(.3, .3, .3);
+    transform: scale3d(.3, .3, .3);
+  }
 
-    -moz-transition: transform 0.5s ease-out;
-    -o-transition: transform 0.5s ease-out;
-    -webkit-transition: -webkit-transform 0.5s ease-out;
-    transition: transform 0.5s ease-out;
+  50% {
+    opacity: 1;
+  }
+}
 
+@keyframes zoomIn {
+  0% {
+    opacity: 0;
+    -webkit-transform: scale3d(.3, .3, .3);
+    transform: scale3d(.3, .3, .3);
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+.zoomIn {
+  -webkit-animation-name: zoomIn;
+  animation-name: zoomIn;
+}
+
+.animated {
+  -webkit-animation-duration: .2s;
+  animation-duration: .2s;
+  -webkit-animation-fill-mode: both;
+  animation-fill-mode: both;
 }
 
 

@@ -4,23 +4,29 @@
 
 function Grid(n, id) {
 
-    var _tiles = [];
+    var _tiles = [],
+        _empty = [];
 
-    for (var i = n - 1; i >= 0; i--) {
+    for (var i = 0; i < n; i++) {
         var row = [];
         row[n - 1] = undefined;
         _tiles[i] = row;
+
+        for (var j = 0; j < n; j++) {
+            _empty.push(i + ',' + j);
+        }
     }
 
     this.tiles = _tiles;
     this.trash = [];
+    this.empty = _empty;
     this.seq = 1;
     this.separatorSize = 10;
     this.tileSize = 100;
     this.id = id;
 }
 
-Grid.prototype.born = function () {
+Grid.prototype.born = function() {
 
     var i,
         j,
@@ -28,6 +34,7 @@ Grid.prototype.born = function () {
         locations = [],
         size = this.tiles.length;
 
+    //  找出空白位置
     for (i = size - 1; i >= 0; i--) {
         row = this.tiles[i];
         for (j = size - 1; j >= 0; j--) {
@@ -38,8 +45,12 @@ Grid.prototype.born = function () {
         }
     }
 
-    // a new tile born with 2 or 4 randomly
-    var newLocation = locations[Math.floor(Math.random() * locations.length)].split(','),
+    if (locations.length === 0) {
+        return;
+    }
+
+    var index = Math.floor(Math.random() * locations.length);
+    var newLocation = locations[index].split(','),
         n = Math.floor(Math.random() * 2 + 1);
     var newTile = new Tile(n);
     i = parseInt(newLocation[0]);
@@ -49,30 +60,26 @@ Grid.prototype.born = function () {
         top = i * this.tileSize + (i + 1) * this.separatorSize,
         tile;
     tile = document.createElement('div');
-    tile.className = 'tile';
+    tile.className = 'tile animated zoomIn';
     tile.id = newTile.id = '' + this.seq++;
     tile.style.width = this.tileSize + 'px';
     tile.style.height = this.tileSize + 'px';
     tile.style.lineHeight = this.tileSize + 'px';
-
     tile.style.top = top + 'px';
     tile.style.left = left + 'px';
 
-    tile.appendChild(document.createTextNode( '' + Math.pow(2, n)));
-
-
+    tile.appendChild(document.createTextNode('' + Math.pow(2, n)));
 
     this.tiles[i][j] = newTile;
 
     var gridId = this.id;
-
-    setTimeout(function(){
+    setTimeout(function() {
         document.getElementById(gridId).appendChild(tile);
     }, 300);
 
 };
 
-Grid.prototype.merge = function () {
+Grid.prototype.merge = function() {
 
     var process = [],
         size = this.tiles.length,
@@ -127,7 +134,7 @@ Grid.prototype.merge = function () {
     return avai;
 };
 
-Grid.prototype.rotateRight90 = function () {
+Grid.prototype.rotateRight90 = function() {
     var process = [],
         size = this.tiles.length - 1;
 
@@ -143,7 +150,7 @@ Grid.prototype.rotateRight90 = function () {
     this.tiles = process;
 };
 
-Grid.prototype.rotateLeft90 = function () {
+Grid.prototype.rotateLeft90 = function() {
     var process = [],
         size = this.tiles.length - 1;
 
@@ -159,7 +166,7 @@ Grid.prototype.rotateLeft90 = function () {
     this.tiles = process;
 };
 
-Grid.prototype.rotate180 = function () {
+Grid.prototype.rotate180 = function() {
     var process = [],
         size = this.tiles.length - 1;
 
@@ -175,33 +182,33 @@ Grid.prototype.rotate180 = function () {
     this.tiles = process;
 };
 
-Grid.prototype.slideUp = function () {
+Grid.prototype.slideUp = function() {
     this.rotateLeft90();
     var avai = this.merge();
     this.rotateRight90();
     return avai;
 };
 
-Grid.prototype.slideLeft = function () {
+Grid.prototype.slideLeft = function() {
     var avai = this.merge();
     return avai;
 };
 
-Grid.prototype.slideRight = function () {
+Grid.prototype.slideRight = function() {
     this.rotate180();
     var avai = this.merge();
     this.rotate180();
     return avai;
 };
 
-Grid.prototype.slideDown = function () {
+Grid.prototype.slideDown = function() {
     this.rotateRight90();
     var avai = this.merge();
     this.rotateLeft90();
     return avai;
 };
 
-Grid.prototype.render = function () {
+Grid.prototype.render = function() {
 
     var grid = document.getElementById(this.id),
         frag = document.createDocumentFragment();
@@ -210,7 +217,7 @@ Grid.prototype.render = function () {
         var row = this.tiles[i];
         for (var j = 0; j < row.length; j++) {
 
-            if(row[j]){
+            if (row[j]) {
                 var left = j * this.tileSize + (j + 1) * this.separatorSize,
                     top = i * this.tileSize + (i + 1) * this.separatorSize,
                     tile;
@@ -219,19 +226,18 @@ Grid.prototype.render = function () {
                 tile.replaceChild(document.createTextNode(
                     row[j] ? '' + Math.pow(2, row[j].pow) : ''), tile.firstChild);
 
-                left = left - parseInt(tile.style.left.replace('px',''));
+                left = left - parseInt(tile.style.left.replace('px', ''));
                 top = top - parseInt(tile.style.top.replace('px', ''));
 
+                tile.className = 'tile tile-' + row[j].pow;
                 tile.style.transform = 'translate(' + left + 'px,' + top + 'px)';
-                tile.className = 'tile slide tile-' + row[j].pow;
-
             }
         }
     }
 
     for (var k = 0; k < this.trash.length; k++) {
         var del = document.getElementById(this.trash[k].id);
-        if(del) {
+        if (del) {
             grid.removeChild(del);
         }
     }
@@ -241,14 +247,14 @@ Grid.prototype.render = function () {
 
 };
 
-(function () {
+(function() {
 
     var g = new Grid(4, 'grid');
 
     g.born();
     g.born();
 
-    window.addEventListener('keyup', function (e) {
+    window.addEventListener('keyup', function(e) {
         switch (e.keyCode) {
             case 37:
                 g.slideLeft();
@@ -271,10 +277,9 @@ Grid.prototype.render = function () {
                 g.render();
                 g.born();
                 break;
-            default :
+            default:
                 break;
         }
     });
 
 })();
-
