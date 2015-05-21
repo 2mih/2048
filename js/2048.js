@@ -1,27 +1,19 @@
-
-function Tile(n){
+function Tile(n) {
     this.pow = n;
 }
 
 function Grid(id) {
 
     var _tiles = [],
-        _empty = [],
         n = 4;
 
     for (var i = 0; i < n; i++) {
         var row = [];
         row[n - 1] = undefined;
         _tiles[i] = row;
-
-        for (var j = 0; j < n; j++) {
-            _empty.push(i + ',' + j);
-        }
     }
 
     this.tiles = _tiles;
-    this.trash = [];
-    this.empty = _empty;
     this.seq = 1;
     this.separatorSize = 10;
     this.tileSize = 100;
@@ -78,7 +70,7 @@ Grid.prototype.born = function() {
     var gridId = this.id;
     setTimeout(function() {
         document.getElementById(gridId).appendChild(tile);
-    }, 0);
+    }, 100);
 
 };
 
@@ -96,7 +88,6 @@ Grid.prototype.merge = function(line, index, direction) {
             if (line[pointer - 1] && merge && line[pointer - 1].pow === cur.pow) {
 
                 this.disappear(line[pointer - 1]);
-
                 cur.pow++;
                 line[pointer - 1] = cur;
 
@@ -166,17 +157,23 @@ Grid.prototype.render = function(tile, index, index2, direction, pow) {
             break;
     }
 
-    top = top - tile.top;
-    left = left - tile.left;
-
     var ele = document.getElementById(tile.id);
     if (ele) {
-        ele.className = 'tile slide';
-        ele.style.transform = 'translate(' + left + 'px,' + top + 'px)';
-        if (pow) {
-
-            ele.replaceChild(document.createTextNode(Math.pow(2, pow)), ele.firstChild);
-        }
+        $(ele).animate({
+            top: top + 'px',
+            left: left + 'px'
+        }, {
+            duration: 100,
+            complete: function() {
+                if (pow) {
+                    ele.className = 'tile';
+                    ele.replaceChild(document.createTextNode(Math.pow(2, pow)), ele.firstChild);
+                    setTimeout(function(){
+                        ele.className = 'tile animated pulse';
+                    },50);
+                }
+            }
+        });
     }
 };
 
@@ -231,23 +228,18 @@ Grid.prototype.slideDown = function() {
         switch (e.keyCode) {
             case 37:
                 g.slideLeft();
-                // g.render();
                 g.born();
-
                 break;
             case 38:
                 g.slideUp();
-                // g.render();
                 g.born();
                 break;
             case 39:
                 g.slideRight();
-                // g.render();
                 g.born();
                 break;
             case 40:
                 g.slideDown();
-                // g.render();
                 g.born();
                 break;
             default:
