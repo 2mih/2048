@@ -1,12 +1,10 @@
 body {
-    font-family: 'Montserrat', sans-serif;
+    font-family:'Montserrat', sans-serif;
 }
-
 #grid {
     margin: 0 auto;
     position: relative;
 }
-
 #grid .tile {
     display: inline-block;
     font-weight: bold;
@@ -15,47 +13,75 @@ body {
     padding: 0;
     background-color: cadetblue;
     position: absolute;
-    
-    -moz-transition: transform 0.2s;
-    -o-transition: transform 0.2s;
-    -webkit-transition: -webkit-transform 0.2s;
-    transition: transform 0.2s;
+    line-height: 100px;
+    width: 100px;
+    height: 100px;
 }
-
+.slide {
+    -moz-transition: transform 0.1s;
+    -o-transition: transform 0.1s;
+    -webkit-transition: -webkit-transform 0.1s;
+    transition: transform 0.1s;
+}
 @-webkit-keyframes zoomIn {
-  0% {
-    opacity: 0;
-    -webkit-transform: scale3d(.3, .3, .3);
-    transform: scale3d(.3, .3, .3);
-  }
-
-  50% {
-    opacity: 1;
-  }
+    0% {
+        opacity: 0;
+        -webkit-transform: scale3d(.3, .3, .3);
+        transform: scale3d(.3, .3, .3);
+    }
+    50% {
+        opacity: 1;
+    }
 }
-
 @keyframes zoomIn {
-  0% {
-    opacity: 0;
-    -webkit-transform: scale3d(.3, .3, .3);
-    transform: scale3d(.3, .3, .3);
-  }
-
-  50% {
-    opacity: 1;
-  }
+    0% {
+        opacity: 0;
+        -webkit-transform: scale3d(.3, .3, .3);
+        transform: scale3d(.3, .3, .3);
+    }
+    50% {
+        opacity: 1;
+    }
 }
-
 .zoomIn {
-  -webkit-animation-name: zoomIn;
-  animation-name: zoomIn;
+    -webkit-animation-name: zoomIn;
+    animation-name: zoomIn;
 }
-
 .animated {
-  -webkit-animation-duration: .2s;
-  animation-duration: .2s;
-  -webkit-animation-fill-mode: both;
-  animation-fill-mode: both;
+    -webkit-animation-duration: .2s;
+    animation-duration: .2s;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
 }
-
-
+@-webkit-keyframes pulse {
+    0% {
+        -webkit-transform: scale3d(1, 1, 1);
+        transform: scale3d(1, 1, 1);
+    }
+    50% {
+        -webkit-transform: scale3d(1.05, 1.05, 1.05);
+        transform: scale3d(1.05, 1.05, 1.05);
+    }
+    100% {
+        -webkit-transform: scale3d(1, 1, 1);
+        transform: scale3d(1, 1, 1);
+    }
+}
+@keyframes pulse {
+    0% {
+        -webkit-transform: scale3d(1, 1, 1);
+        transform: scale3d(1, 1, 1);
+    }
+    50% {
+        -webkit-transform: scale3d(1.05, 1.05, 1.05);
+        transform: scale3d(1.05, 1.05, 1.05);
+    }
+    100% {
+        -webkit-transform: scale3d(1, 1, 1);
+        transform: scale3d(1, 1, 1);
+    }
+}
+.pulse {
+    -webkit-animation-name: pulse;
+    animation-name: pulse;
+}

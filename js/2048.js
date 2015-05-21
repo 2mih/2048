@@ -1,11 +1,13 @@
-/**
- * Created by Leo on 2015/5/1.
- */
 
-function Grid(n, id) {
+function Tile(n){
+    this.pow = n;
+}
+
+function Grid(id) {
 
     var _tiles = [],
-        _empty = [];
+        _empty = [],
+        n = 4;
 
     for (var i = 0; i < n; i++) {
         var row = [];
@@ -62,11 +64,12 @@ Grid.prototype.born = function() {
     tile = document.createElement('div');
     tile.className = 'tile animated zoomIn';
     tile.id = newTile.id = '' + this.seq++;
-    tile.style.width = this.tileSize + 'px';
-    tile.style.height = this.tileSize + 'px';
-    tile.style.lineHeight = this.tileSize + 'px';
+
     tile.style.top = top + 'px';
     tile.style.left = left + 'px';
+
+    newTile.top = top;
+    newTile.left = left;
 
     tile.appendChild(document.createTextNode('' + Math.pow(2, n)));
 
@@ -75,181 +78,151 @@ Grid.prototype.born = function() {
     var gridId = this.id;
     setTimeout(function() {
         document.getElementById(gridId).appendChild(tile);
-    }, 300);
+    }, 0);
 
 };
 
-Grid.prototype.merge = function() {
+Grid.prototype.merge = function(line, index, direction) {
 
-    var process = [],
-        size = this.tiles.length,
-        avai = true,
-        tmp,
-        cur,
-        line;
+    var pointer = 0,
+        size = 4,
+        merge = true;
 
-    for (var j = 0; j < size; j++) {
-        line = this.tiles[j];
-        for (var i = 0; i < size; i++) {
-            cur = line[i];
-            if (cur) {
-                if (tmp) {
-                    if (tmp.pow === cur.pow) {
-                        this.trash.push(tmp);
-                        tmp = undefined;
+    for (i = 0; i < size; i++) {
+        cur = line[i];
+        line[i] = undefined;
+        if (cur) {
 
-                        cur.pow++;
-                        process.push(cur);
-                    } else {
-                        process.push(tmp);
-                        tmp = cur;
-                    }
-                } else {
-                    tmp = cur;
-                }
+            if (line[pointer - 1] && merge && line[pointer - 1].pow === cur.pow) {
+
+                this.disappear(line[pointer - 1]);
+
+                cur.pow++;
+                line[pointer - 1] = cur;
+
+                merge = false;
+                this.render(cur, index, pointer - 1, direction, cur.pow);
+            } else {
+                line[pointer] = cur;
+                merge = true;
+
+                this.render(cur, index, pointer, direction);
+
+                pointer++;
             }
         }
-
-        if (tmp) {
-            process.push(tmp);
-        }
-
-        // 补足长度
-        if (!process[size - 1]) {
-            process[size - 1] = undefined;
-        }
-
-        // 步骤是否有效
-        if (avai) {
-            for (var k = 0; k < size; k++) {
-                avai = avai && (line[k] === process[k]);
-            }
-        }
-
-        this.tiles[j] = process;
-        tmp = undefined;
-        process = [];
     }
 
-    return avai;
+    for (i = 0; i < 4; i++) {
+        var t = line[i];
+        switch (direction) {
+            case 'up':
+                this.tiles[i][index] = t;
+                break;
+            case 'left':
+                this.tiles[index][i] = t;
+                break;
+            case 'down':
+                this.tiles[3 - i][index] = t;
+                break;
+            case 'right':
+                this.tiles[index][3 - i] = t;
+                break;
+            default:
+                break;
+        }
+    }
 };
 
-Grid.prototype.rotateRight90 = function() {
-    var process = [],
-        size = this.tiles.length - 1;
+Grid.prototype.disappear = function(tile) {
 
-    for (var i = 0; i < this.tiles.length; i++) {
-        var row = this.tiles[i];
-        for (var j = 0; j < row.length; j++) {
-            var cell = row[j];
-            process[j] = process[j] || [];
-            process[j][size - i] = cell;
-        }
-    }
+    document.getElementById(this.id).removeChild(document.getElementById(tile.id));
 
-    this.tiles = process;
 };
 
-Grid.prototype.rotateLeft90 = function() {
-    var process = [],
-        size = this.tiles.length - 1;
+Grid.prototype.render = function(tile, index, index2, direction, pow) {
 
-    for (var i = 0; i < this.tiles.length; i++) {
-        var row = this.tiles[i];
-        for (var j = 0; j < row.length; j++) {
-            var cell = row[j];
-            process[size - j] = process[size - j] || [];
-            process[size - j][i] = cell;
-        }
+    var top,
+        left;
+
+    switch (direction) {
+        case 'up':
+            top = index2 * this.tileSize + (index2 + 1) * this.separatorSize;
+            left = index * this.tileSize + (index + 1) * this.separatorSize;
+            break;
+        case 'left':
+            top = index * this.tileSize + (index + 1) * this.separatorSize;
+            left = index2 * this.tileSize + (index2 + 1) * this.separatorSize;
+            break;
+        case 'down':
+            top = (3 - index2) * this.tileSize + (3 - index2 + 1) * this.separatorSize;
+            left = index * this.tileSize + (index + 1) * this.separatorSize;
+            break;
+        case 'right':
+            top = index * this.tileSize + (index + 1) * this.separatorSize;
+            left = (3 - index2) * this.tileSize + (3 - index2 + 1) * this.separatorSize;
+            break;
+        default:
+            break;
     }
 
-    this.tiles = process;
-};
+    top = top - tile.top;
+    left = left - tile.left;
 
-Grid.prototype.rotate180 = function() {
-    var process = [],
-        size = this.tiles.length - 1;
+    var ele = document.getElementById(tile.id);
+    if (ele) {
+        ele.className = 'tile slide';
+        ele.style.transform = 'translate(' + left + 'px,' + top + 'px)';
+        if (pow) {
 
-    for (var i = 0; i < this.tiles.length; i++) {
-        var row = this.tiles[i];
-        for (var j = 0; j < row.length; j++) {
-            var cell = row[j];
-            process[size - i] = process[size - i] || [];
-            process[size - i][size - j] = cell;
+            ele.replaceChild(document.createTextNode(Math.pow(2, pow)), ele.firstChild);
         }
     }
-
-    this.tiles = process;
 };
 
 Grid.prototype.slideUp = function() {
-    this.rotateLeft90();
-    var avai = this.merge();
-    this.rotateRight90();
-    return avai;
+
+    for (var i = 0; i < 4; i++) {
+        var line = [];
+        for (var j = 0; j < 4; j++) {
+            line[j] = this.tiles[j][i];
+        }
+
+        this.merge(line, i, 'up');
+    }
 };
 
 Grid.prototype.slideLeft = function() {
-    var avai = this.merge();
-    return avai;
+    for (var i = 0; i < 4; i++) {
+        this.merge(this.tiles[i], i, 'left');
+    }
 };
 
 Grid.prototype.slideRight = function() {
-    this.rotate180();
-    var avai = this.merge();
-    this.rotate180();
-    return avai;
+    for (var i = 0; i < 4; i++) {
+        var line = [];
+        for (var j = 0; j < 4; j++) {
+            line[j] = this.tiles[i][3 - j];
+        }
+
+        this.merge(line, i, 'right');
+    }
 };
 
 Grid.prototype.slideDown = function() {
-    this.rotateRight90();
-    var avai = this.merge();
-    this.rotateLeft90();
-    return avai;
-};
-
-Grid.prototype.render = function() {
-
-    var grid = document.getElementById(this.id),
-        frag = document.createDocumentFragment();
-
-    for (var i = 0; i < this.tiles.length; i++) {
-        var row = this.tiles[i];
-        for (var j = 0; j < row.length; j++) {
-
-            if (row[j]) {
-                var left = j * this.tileSize + (j + 1) * this.separatorSize,
-                    top = i * this.tileSize + (i + 1) * this.separatorSize,
-                    tile;
-
-                tile = document.getElementById(row[j].id);
-                tile.replaceChild(document.createTextNode(
-                    row[j] ? '' + Math.pow(2, row[j].pow) : ''), tile.firstChild);
-
-                left = left - parseInt(tile.style.left.replace('px', ''));
-                top = top - parseInt(tile.style.top.replace('px', ''));
-
-                tile.className = 'tile tile-' + row[j].pow;
-                tile.style.transform = 'translate(' + left + 'px,' + top + 'px)';
-            }
+    for (var i = 0; i < 4; i++) {
+        var line = [];
+        for (var j = 0; j < 4; j++) {
+            line[j] = this.tiles[3 - j][i];
         }
+
+        this.merge(line, i, 'down');
     }
-
-    for (var k = 0; k < this.trash.length; k++) {
-        var del = document.getElementById(this.trash[k].id);
-        if (del) {
-            grid.removeChild(del);
-        }
-    }
-    this.trash = [];
-
-    grid.appendChild(frag);
-
 };
 
 (function() {
 
-    var g = new Grid(4, 'grid');
+    var g = new Grid('grid');
 
     g.born();
     g.born();
@@ -258,23 +231,23 @@ Grid.prototype.render = function() {
         switch (e.keyCode) {
             case 37:
                 g.slideLeft();
-                g.render();
+                // g.render();
                 g.born();
 
                 break;
             case 38:
                 g.slideUp();
-                g.render();
+                // g.render();
                 g.born();
                 break;
             case 39:
                 g.slideRight();
-                g.render();
+                // g.render();
                 g.born();
                 break;
             case 40:
                 g.slideDown();
-                g.render();
+                // g.render();
                 g.born();
                 break;
             default:
