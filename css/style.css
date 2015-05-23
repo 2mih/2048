@@ -1,22 +1,136 @@
 body {
     font-family: arial, sans-serif;
+    background-color: #FAF8EF;
 }
-#grid {
-    margin: 0 auto;
+
+#main {
+    margin: 100px auto 0;
     position: relative;
+    width: 450px;
+    height: 450px;
+    background: #C0B19B;
 }
+
+#background {
+    position: absolute;
+    background: #BBADA0;
+}
+
+#background .tile-bg {
+    background: #CCC0B3;
+    position: absolute;
+    width: 100px;
+    height: 100px;
+}
+
+.tile-bg.tile-bg-row-0 {
+    top: 10px;
+}
+
+.tile-bg.tile-bg-row-1 {
+    top: 120px;
+}
+
+.tile-bg.tile-bg-row-2 {
+    top: 230px;
+}
+
+.tile-bg.tile-bg-row-3 {
+    top: 340px;
+}
+
+.tile-bg.tile-bg-column-0 {
+    left: 10px;
+}
+
+.tile-bg.tile-bg-column-1 {
+    left: 120px;
+}
+
+.tile-bg.tile-bg-column-2 {
+    left: 230px;
+}
+
+.tile-bg.tile-bg-column-3 {
+    left: 340px;
+}
+
+#grid {
+    position: absolute;
+}
+
 #grid .tile {
     display: inline-block;
     font-weight: bold;
     font-size: 38px;
     text-align: center;
     padding: 0;
-    background-color: cadetblue;
     position: absolute;
     line-height: 100px;
     width: 100px;
     height: 100px;
+    color: #F9F6F2;
 }
+
+.zoomIn {
+    -webkit-animation-name: zoomIn;
+    animation-name: zoomIn;
+}
+
+.pulse {
+    -webkit-animation-name: pulse;
+    animation-name: pulse;
+}
+
+.animated {
+    -webkit-animation-duration: .2s;
+    animation-duration: .2s;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
+}
+
+.tile-1 {
+    background-color: #EEE4DA;
+    color: #776E65 !important;
+}
+
+.tile-2 {
+    background-color: #EDE0C8;
+    color: #776E65 !important;
+}
+
+.tile-3 {
+    background-color: #F2B179;
+}
+
+.tile-4 {
+    background-color: #F59562;
+}
+
+.tile-5 {
+    background-color: #F67C5F;
+}
+
+.tile-6 {
+    background-color: #F65E3B;
+}
+
+.tile-7 {
+    background-color: #EDCF72;
+}
+
+.tile-8 {
+    background-color: #EDCC61;
+}
+
+.tile-9 {
+    background-color: #EDC850;
+}
+
+.tile-10 {
+    background-color: #EDC53F;
+}
+
 @-webkit-keyframes zoomIn {
     0% {
         opacity: 0;
@@ -27,6 +141,7 @@ body {
         opacity: 1;
     }
 }
+
 @keyframes zoomIn {
     0% {
         opacity: 0;
@@ -37,16 +152,7 @@ body {
         opacity: 1;
     }
 }
-.zoomIn {
-    -webkit-animation-name: zoomIn;
-    animation-name: zoomIn;
-}
-.animated {
-    -webkit-animation-duration: .2s;
-    animation-duration: .2s;
-    -webkit-animation-fill-mode: both;
-    animation-fill-mode: both;
-}
+
 @-webkit-keyframes pulse {
     0% {
         -webkit-transform: scale3d(1, 1, 1);
@@ -61,6 +167,7 @@ body {
         transform: scale3d(1, 1, 1);
     }
 }
+
 @keyframes pulse {
     0% {
         -webkit-transform: scale3d(1, 1, 1);
@@ -75,7 +182,4 @@ body {
         transform: scale3d(1, 1, 1);
     }
 }
-.pulse {
-    -webkit-animation-name: pulse;
-    animation-name: pulse;
-}
+

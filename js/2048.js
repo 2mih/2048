@@ -53,19 +53,17 @@ Grid.prototype.born = function() {
     var left = j * this.tileSize + (j + 1) * this.separatorSize,
         top = i * this.tileSize + (i + 1) * this.separatorSize,
         tile;
-    tile = document.createElement('div');
-    tile.className = 'tile animated zoomIn';
-    tile.id = newTile.id = '' + this.seq++;
-
-    tile.style.top = top + 'px';
-    tile.style.left = left + 'px';
 
     newTile.top = top;
     newTile.left = left;
-
-    tile.appendChild(document.createTextNode('' + Math.pow(2, n)));
-
     this.tiles[i][j] = newTile;
+
+    tile = document.createElement('div');
+    tile.className = 'tile animated zoomIn tile-' + n;
+    tile.id = newTile.id = '' + this.seq++;
+    tile.style.top = top + 'px';
+    tile.style.left = left + 'px';
+    tile.appendChild(document.createTextNode('' + Math.pow(2, n)));
 
     var gridId = this.id;
     setTimeout(function() {
@@ -78,10 +76,11 @@ Grid.prototype.merge = function(line, index, direction) {
 
     var pointer = 0,
         size = 4,
-        merge = true;
+        merge = true,
+        moved = false;
 
-    for (i = 0; i < size; i++) {
-        cur = line[i];
+    for (var i = 0; i < size; i++) {
+        var cur = line[i];
         line[i] = undefined;
         if (cur) {
 
@@ -102,6 +101,8 @@ Grid.prototype.merge = function(line, index, direction) {
                 pointer++;
             }
         }
+
+        moved = moved || (cur !== line[i]);
     }
 
     for (i = 0; i < 4; i++) {
@@ -123,6 +124,8 @@ Grid.prototype.merge = function(line, index, direction) {
                 break;
         }
     }
+
+    return moved;
 };
 
 Grid.prototype.disappear = function(tile) {
@@ -167,9 +170,9 @@ Grid.prototype.render = function(tile, index, index2, direction, pow) {
             complete: function() {
                 if (pow) {
                     ele.className = 'tile';
-                    ele.replaceChild(document.createTextNode(Math.pow(2, pow)), ele.firstChild);
+                    ele.replaceChild(document.createTextNode(Math.pow(2, pow) + ''), ele.firstChild);
                     setTimeout(function(){
-                        ele.className = 'tile animated pulse';
+                        ele.className = 'tile animated pulse tile-' + pow;
                     },50);
                 }
             }
@@ -179,42 +182,63 @@ Grid.prototype.render = function(tile, index, index2, direction, pow) {
 
 Grid.prototype.slideUp = function() {
 
+    var moved = false;
+
     for (var i = 0; i < 4; i++) {
         var line = [];
         for (var j = 0; j < 4; j++) {
             line[j] = this.tiles[j][i];
         }
 
-        this.merge(line, i, 'up');
+        var result = this.merge(line, i, 'up');
+        moved = moved || result;
     }
+
+    return moved;
 };
 
 Grid.prototype.slideLeft = function() {
+
+    var moved = false;
+
     for (var i = 0; i < 4; i++) {
-        this.merge(this.tiles[i], i, 'left');
+        var result = this.merge(this.tiles[i], i, 'left');
+        moved = moved || result;
     }
+
+    return moved;
 };
 
 Grid.prototype.slideRight = function() {
+
+    var moved = false;
+
     for (var i = 0; i < 4; i++) {
         var line = [];
         for (var j = 0; j < 4; j++) {
             line[j] = this.tiles[i][3 - j];
         }
-
-        this.merge(line, i, 'right');
+        var result = this.merge(line, i, 'right');
+        moved = moved || result;
     }
+
+    return moved;
 };
 
 Grid.prototype.slideDown = function() {
+
+    var moved = false;
+
     for (var i = 0; i < 4; i++) {
         var line = [];
         for (var j = 0; j < 4; j++) {
             line[j] = this.tiles[3 - j][i];
         }
-
-        this.merge(line, i, 'down');
+        var result = this.merge(line, i, 'down');
+        moved = moved || result;
     }
+
+    return moved;
 };
 
 (function() {
@@ -227,20 +251,16 @@ Grid.prototype.slideDown = function() {
     window.addEventListener('keyup', function(e) {
         switch (e.keyCode) {
             case 37:
-                g.slideLeft();
-                g.born();
+                g.slideLeft() && g.born();
                 break;
             case 38:
-                g.slideUp();
-                g.born();
+                g.slideUp() && g.born();
                 break;
             case 39:
-                g.slideRight();
-                g.born();
+                g.slideRight() && g.born();
                 break;
             case 40:
-                g.slideDown();
-                g.born();
+                g.slideDown() && g.born();
                 break;
             default:
                 break;
