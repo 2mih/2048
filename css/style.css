@@ -1,10 +1,32 @@
 body {
     font-family: arial, sans-serif;
     background-color: #FAF8EF;
+    margin: 0;
+    padding: 0;
+}
+
+.wrapper {
+    margin: 0 auto;
+    width: 450px;
+}
+
+#tip {
+    margin: 30px auto;
+}
+
+#tip p {
+    line-height: 25px;
+    font-size: 18px;
+    color: #666666;
+}
+
+#tip p strong {
+    font-weight: bold;
+    font-size: 25px;
 }
 
 #main {
-    margin: 100px auto 0;
+    margin: 0 auto;
     position: relative;
     width: 450px;
     height: 450px;
@@ -27,6 +49,22 @@ body {
     -webkit-border-radius: 3px;
     -moz-border-radius: 3px;
     border-radius: 3px;
+}
+
+#gameover {
+    background-color: rgba(255,255,255,0.8);
+    display: none;
+    position: absolute;
+    height: 450px;
+    width: 450px;
+}
+
+#gameover p {
+    text-align: center;
+    line-height: 60px;
+    font-size: 60px;
+    color: #776E65;
+    margin-top: 195px;
 }
 
 .tile-bg.tile-bg-row-0 {
@@ -81,22 +119,7 @@ body {
     border-radius: 3px;
 }
 
-.zoomIn {
-    -webkit-animation-name: zoomIn;
-    animation-name: zoomIn;
-}
 
-.pulse {
-    -webkit-animation-name: pulse;
-    animation-name: pulse;
-}
-
-.animated {
-    -webkit-animation-duration: .2s;
-    animation-duration: .2s;
-    -webkit-animation-fill-mode: both;
-    animation-fill-mode: both;
-}
 
 .tile-1 {
     background-color: #EEE4DA;
@@ -192,3 +215,19 @@ body {
     }
 }
 
+.zoomIn {
+    -webkit-animation-name: zoomIn;
+    animation-name: zoomIn;
+}
+
+.pulse {
+    -webkit-animation-name: pulse;
+    animation-name: pulse;
+}
+
+.animated {
+    -webkit-animation-duration: .2s;
+    animation-duration: .2s;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
+}

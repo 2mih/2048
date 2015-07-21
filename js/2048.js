@@ -39,11 +39,6 @@ Grid.prototype.born = function () {
         }
     }
 
-    /* To Do
-
-     */
-
-
     var index = Math.floor(Math.random() * locations.length);
     var newLocation = locations[index].split(','),
         n = Math.floor(Math.random() * 2 + 1);
@@ -66,25 +61,19 @@ Grid.prototype.born = function () {
     tile.style.left = left + 'px';
     tile.appendChild(document.createTextNode('' + Math.pow(2, n)));
 
-    var gridId = this.id;
+    var gridId = this.id,
+        me = this;
+
+    // document.getElementById(gridId).appendChild(tile);
+
     setTimeout(function () {
         document.getElementById(gridId).appendChild(tile);
+        if (locations.length === 1) {
+            me.gameover();
+        }
     }, 100);
 
-
 };
-
-Grid.prototype.existDuplicate = function (array) {
-
-    for (var i = 0; i < array.length - 1; i++) {
-        if (array[i] === array[i + 1]) {
-            return true;
-        }
-    }
-
-    return false;
-
-}
 
 Grid.prototype.merge = function (line, index, direction) {
 
@@ -144,14 +133,31 @@ Grid.prototype.merge = function (line, index, direction) {
 
 Grid.prototype.disappear = function (tile) {
 
-    document.getElementById(this.id).removeChild(document.getElementById(tile.id));
+    var node = document.getElementById(tile.id);
+    if (node) {
+        node.parentNode.removeChild(node);
+    }
+
+};
+
+
+Grid.prototype.existDuplicate = function (array) {
+
+    for (var i = 0; i < array.length - 1; i++) {
+        if (array[i].pow === array[i + 1].pow) {
+            return true;
+        }
+    }
+
+    return false;
 
 };
 
 Grid.prototype.gameover = function () {
 
-    if (document.getElementById(this.id).childNodes.length === Math.pow(this.tiles.length, 2)) {
-        for (var k = 0; k < size; k++) {
+    var size = this.tiles.length;
+
+    for (var k = 0; k < size; k++) {
             if (this.existDuplicate(this.tiles[k])) {
                 return false;
             }
@@ -165,9 +171,8 @@ Grid.prototype.gameover = function () {
                 return false;
             }
         }
-    }
 
-    alert('Game Over!');
+    document.getElementById('gameover').style.display = 'block';
 }
 
 Grid.prototype.render = function (tile, index, index2, direction, pow) {
@@ -288,16 +293,20 @@ Grid.prototype.slideDown = function () {
     window.addEventListener('keyup', function (e) {
         switch (e.keyCode) {
             case 37:
-                g.slideLeft() && g.born() && g.gameover();
+            case 65:
+                g.slideLeft() && g.born();
                 break;
             case 38:
-                g.slideUp() && g.born() && g.gameover();
+            case 87:
+                g.slideUp() && g.born();
                 break;
             case 39:
-                g.slideRight() && g.born() && g.gameover();
+            case 68:
+                g.slideRight() && g.born();
                 break;
             case 40:
-                g.slideDown() && g.born() && g.gameover();
+            case 83:
+                g.slideDown() && g.born();
                 break;
             default:
                 break;
