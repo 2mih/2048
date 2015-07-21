@@ -20,7 +20,7 @@ function Grid(id) {
     this.id = id;
 }
 
-Grid.prototype.born = function() {
+Grid.prototype.born = function () {
 
     var i,
         j,
@@ -39,9 +39,10 @@ Grid.prototype.born = function() {
         }
     }
 
-    if (locations.length === 0) {
-        return;
-    }
+    /* To Do
+
+     */
+
 
     var index = Math.floor(Math.random() * locations.length);
     var newLocation = locations[index].split(','),
@@ -66,13 +67,26 @@ Grid.prototype.born = function() {
     tile.appendChild(document.createTextNode('' + Math.pow(2, n)));
 
     var gridId = this.id;
-    setTimeout(function() {
+    setTimeout(function () {
         document.getElementById(gridId).appendChild(tile);
     }, 100);
 
+
 };
 
-Grid.prototype.merge = function(line, index, direction) {
+Grid.prototype.existDuplicate = function (array) {
+
+    for (var i = 0; i < array.length - 1; i++) {
+        if (array[i] === array[i + 1]) {
+            return true;
+        }
+    }
+
+    return false;
+
+}
+
+Grid.prototype.merge = function (line, index, direction) {
 
     var pointer = 0,
         size = 4,
@@ -128,13 +142,35 @@ Grid.prototype.merge = function(line, index, direction) {
     return moved;
 };
 
-Grid.prototype.disappear = function(tile) {
+Grid.prototype.disappear = function (tile) {
 
     document.getElementById(this.id).removeChild(document.getElementById(tile.id));
 
 };
 
-Grid.prototype.render = function(tile, index, index2, direction, pow) {
+Grid.prototype.gameover = function () {
+
+    if (document.getElementById(this.id).childNodes.length === Math.pow(this.tiles.length, 2)) {
+        for (var k = 0; k < size; k++) {
+            if (this.existDuplicate(this.tiles[k])) {
+                return false;
+            }
+
+            var col = [];
+            for (var l = 0; l < size; l++) {
+                col.push(this.tiles[l][k]);
+            }
+
+            if (this.existDuplicate(col)) {
+                return false;
+            }
+        }
+    }
+
+    alert('Game Over!');
+}
+
+Grid.prototype.render = function (tile, index, index2, direction, pow) {
 
     var top,
         left;
@@ -167,20 +203,21 @@ Grid.prototype.render = function(tile, index, index2, direction, pow) {
             left: left + 'px'
         }, {
             duration: 100,
-            complete: function() {
+            complete: function () {
                 if (pow) {
+
                     ele.className = 'tile';
-                    ele.replaceChild(document.createTextNode(Math.pow(2, pow) + ''), ele.firstChild);
-                    setTimeout(function(){
+                    setTimeout(function () {
                         ele.className = 'tile animated pulse tile-' + pow;
-                    },50);
+                        ele.replaceChild(document.createTextNode(Math.pow(2, pow) + ''), ele.firstChild);
+                    }, 50);
                 }
             }
         });
     }
 };
 
-Grid.prototype.slideUp = function() {
+Grid.prototype.slideUp = function () {
 
     var moved = false;
 
@@ -197,7 +234,7 @@ Grid.prototype.slideUp = function() {
     return moved;
 };
 
-Grid.prototype.slideLeft = function() {
+Grid.prototype.slideLeft = function () {
 
     var moved = false;
 
@@ -209,7 +246,7 @@ Grid.prototype.slideLeft = function() {
     return moved;
 };
 
-Grid.prototype.slideRight = function() {
+Grid.prototype.slideRight = function () {
 
     var moved = false;
 
@@ -225,7 +262,7 @@ Grid.prototype.slideRight = function() {
     return moved;
 };
 
-Grid.prototype.slideDown = function() {
+Grid.prototype.slideDown = function () {
 
     var moved = false;
 
@@ -241,26 +278,26 @@ Grid.prototype.slideDown = function() {
     return moved;
 };
 
-(function() {
+(function () {
 
     var g = new Grid('grid');
 
     g.born();
     g.born();
 
-    window.addEventListener('keyup', function(e) {
+    window.addEventListener('keyup', function (e) {
         switch (e.keyCode) {
             case 37:
-                g.slideLeft() && g.born();
+                g.slideLeft() && g.born() && g.gameover();
                 break;
             case 38:
-                g.slideUp() && g.born();
+                g.slideUp() && g.born() && g.gameover();
                 break;
             case 39:
-                g.slideRight() && g.born();
+                g.slideRight() && g.born() && g.gameover();
                 break;
             case 40:
-                g.slideDown() && g.born();
+                g.slideDown() && g.born() && g.gameover();
                 break;
             default:
                 break;

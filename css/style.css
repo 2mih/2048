@@ -9,6 +9,9 @@ body {
     width: 450px;
     height: 450px;
     background: #C0B19B;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
 }
 
 #background {
@@ -21,6 +24,9 @@ body {
     position: absolute;
     width: 100px;
     height: 100px;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
 }
 
 .tile-bg.tile-bg-row-0 {
@@ -70,6 +76,9 @@ body {
     width: 100px;
     height: 100px;
     color: #F9F6F2;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
 }
 
 .zoomIn {
