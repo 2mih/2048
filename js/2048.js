@@ -1,7 +1,19 @@
+/**
+ * 方块类
+ * @class
+ * @param
+ *      n   方块数值对应的2的指数
+ */
 function Tile(n) {
     this.pow = n;
 }
 
+/**
+ * 格子类
+ * @class
+ * @param
+ *      id   格子对应的元素ID  
+ */
 function Grid(id) {
 
     var _tiles = [],
@@ -14,21 +26,26 @@ function Grid(id) {
     }
 
     this.tiles = _tiles;
-    this.seq = 1;
+    this.size = n;
+    this.seq = 1;  // 序列，用于方块的唯一标识
     this.separatorSize = 10;
     this.tileSize = 100;
     this.id = id;
 }
 
+/**
+ * 生成新的方块
+ * @method
+ */
 Grid.prototype.born = function () {
 
     var i,
         j,
         row,
         locations = [],
-        size = this.tiles.length;
+        size = this.size;
 
-    //  找出空白位置
+    // 找出所有空的格子
     for (i = size - 1; i >= 0; i--) {
         row = this.tiles[i];
         for (j = size - 1; j >= 0; j--) {
@@ -39,20 +56,18 @@ Grid.prototype.born = function () {
         }
     }
 
+    // 生成新的方块，数值为2或4  
     var index = Math.floor(Math.random() * locations.length);
     var newLocation = locations[index].split(','),
         n = Math.floor(Math.random() * 2 + 1);
     var newTile = new Tile(n);
+
+    // 得到新方块位置
     i = parseInt(newLocation[0]);
     j = parseInt(newLocation[1]);
-
     var left = j * this.tileSize + (j + 1) * this.separatorSize,
         top = i * this.tileSize + (i + 1) * this.separatorSize,
         tile;
-
-    newTile.top = top;
-    newTile.left = left;
-    this.tiles[i][j] = newTile;
 
     tile = document.createElement('div');
     tile.className = 'tile animated zoomIn tile-' + n;
@@ -61,13 +76,17 @@ Grid.prototype.born = function () {
     tile.style.left = left + 'px';
     tile.appendChild(document.createTextNode('' + Math.pow(2, n)));
 
+    newTile.top = top;
+    newTile.left = left;
+    this.tiles[i][j] = newTile;
+
     var gridId = this.id,
         me = this;
 
-    // document.getElementById(gridId).appendChild(tile);
-
     setTimeout(function () {
         document.getElementById(gridId).appendChild(tile);
+
+        // 格子填满时，判断是否无路可走
         if (locations.length === 1) {
             me.gameover();
         }
@@ -75,10 +94,19 @@ Grid.prototype.born = function () {
 
 };
 
+/**
+ * 方块合并，可合并一个方块队列
+ * @method
+ * @param
+ *      line    方块队列
+ *      index    队列的索引
+ *      direction    合并的方向
+ * @return    是否有方块产生位移
+ */ 
 Grid.prototype.merge = function (line, index, direction) {
 
     var pointer = 0,
-        size = 4,
+        size = this.size,
         merge = true,
         moved = false;
 
@@ -87,13 +115,14 @@ Grid.prototype.merge = function (line, index, direction) {
         line[i] = undefined;
         if (cur) {
 
+            // 合并
             if (line[pointer - 1] && merge && line[pointer - 1].pow === cur.pow) {
 
                 this.disappear(line[pointer - 1]);
                 cur.pow++;
                 line[pointer - 1] = cur;
 
-                merge = false;
+                merge = false;  // 一次操作中，合并后的格子不能二次合并
                 this.render(cur, index, pointer - 1, direction, cur.pow);
             } else {
                 line[pointer] = cur;
@@ -105,10 +134,11 @@ Grid.prototype.merge = function (line, index, direction) {
             }
         }
 
+        // 是否有方块产生位移
         moved = moved || (cur !== line[i]);
     }
 
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < size; i++) {
         var t = line[i];
         switch (direction) {
             case 'up':
@@ -118,10 +148,10 @@ Grid.prototype.merge = function (line, index, direction) {
                 this.tiles[index][i] = t;
                 break;
             case 'down':
-                this.tiles[3 - i][index] = t;
+                this.tiles[size - 1 - i][index] = t;
                 break;
             case 'right':
-                this.tiles[index][3 - i] = t;
+                this.tiles[index][size - 1 - i] = t;
                 break;
             default:
                 break;
@@ -131,6 +161,12 @@ Grid.prototype.merge = function (line, index, direction) {
     return moved;
 };
 
+/**
+ * 清理被合并的方块
+ * @method
+ * @param
+ *      tile    方块
+ */
 Grid.prototype.disappear = function (tile) {
 
     var node = document.getElementById(tile.id);
@@ -140,7 +176,12 @@ Grid.prototype.disappear = function (tile) {
 
 };
 
-
+/**
+ * 检测是否可以继续合并
+ * @method
+ * @param
+ *      array    方块队列
+ */
 Grid.prototype.existDuplicate = function (array) {
 
     for (var i = 0; i < array.length - 1; i++) {
@@ -153,9 +194,13 @@ Grid.prototype.existDuplicate = function (array) {
 
 };
 
+/**
+ * 检测游戏是否已经结束
+ * @method
+ */
 Grid.prototype.gameover = function () {
 
-    var size = this.tiles.length;
+    var size = this.size;
 
     for (var k = 0; k < size; k++) {
             if (this.existDuplicate(this.tiles[k])) {
@@ -175,11 +220,23 @@ Grid.prototype.gameover = function () {
     document.getElementById('gameover').style.display = 'block';
 }
 
+/**
+ * 检测是否可以继续合并
+ * @method
+ * @param
+ *      tile    方块
+ *      index    队列索引
+ *      index2    方块索引
+ *      direction    位移方向
+ *      pow    新的指数
+ */
 Grid.prototype.render = function (tile, index, index2, direction, pow) {
 
     var top,
-        left;
+        left,
+        size = this.size;
 
+    // 得到方块新的位置
     switch (direction) {
         case 'up':
             top = index2 * this.tileSize + (index2 + 1) * this.separatorSize;
@@ -190,12 +247,12 @@ Grid.prototype.render = function (tile, index, index2, direction, pow) {
             left = index2 * this.tileSize + (index2 + 1) * this.separatorSize;
             break;
         case 'down':
-            top = (3 - index2) * this.tileSize + (3 - index2 + 1) * this.separatorSize;
+            top = (size - 1 - index2) * this.tileSize + (size - index2) * this.separatorSize;
             left = index * this.tileSize + (index + 1) * this.separatorSize;
             break;
         case 'right':
             top = index * this.tileSize + (index + 1) * this.separatorSize;
-            left = (3 - index2) * this.tileSize + (3 - index2 + 1) * this.separatorSize;
+            left = (size - 1 - index2) * this.tileSize + (size - index2) * this.separatorSize;
             break;
         default:
             break;
@@ -203,14 +260,15 @@ Grid.prototype.render = function (tile, index, index2, direction, pow) {
 
     var ele = document.getElementById(tile.id);
     if (ele) {
+        // 方块位移
         $(ele).animate({
             top: top + 'px',
             left: left + 'px'
         }, {
             duration: 100,
+            // 合并时的动画效果
             complete: function () {
                 if (pow) {
-
                     ele.className = 'tile';
                     setTimeout(function () {
                         ele.className = 'tile animated pulse tile-' + pow;
@@ -222,6 +280,10 @@ Grid.prototype.render = function (tile, index, index2, direction, pow) {
     }
 };
 
+/**
+ * 向上移动
+ * @method
+ */
 Grid.prototype.slideUp = function () {
 
     var moved = false;
@@ -239,6 +301,10 @@ Grid.prototype.slideUp = function () {
     return moved;
 };
 
+/**
+ * 向左移动
+ * @method
+ */
 Grid.prototype.slideLeft = function () {
 
     var moved = false;
@@ -251,6 +317,10 @@ Grid.prototype.slideLeft = function () {
     return moved;
 };
 
+/**
+ * 向右移动
+ * @method
+ */
 Grid.prototype.slideRight = function () {
 
     var moved = false;
@@ -267,6 +337,10 @@ Grid.prototype.slideRight = function () {
     return moved;
 };
 
+/**
+ * 向下移动
+ * @method
+ */
 Grid.prototype.slideDown = function () {
 
     var moved = false;
